@@ -8,7 +8,7 @@ function App() {
   const iswithnonumberafterpoint = /^\d+\.$/g;
   const isnotminus = /^[\+\/\*\%]$/g;
   const isnotoperator = /^[^\+\/\*\%\-]$/g;
-
+  const containsdot = /^\d+\.\d+$/g;
   const [number, setnumber] = useState("0");
   const [formula, setformula] = useState("");
   const clear = () => {
@@ -18,28 +18,39 @@ function App() {
   const clearnumber = () => {};
   const evaluate = () => {};
   const numberfunction = (x) => {
-    console.log(isvalidnumber.test(number));
+    if (x === ".") {
+      if (containsdot.test(number)) {
+        return;
+      }
+    }
 
     if (number.length === 1 && number === "0") {
       if (x === ".") {
         setnumber(number + x);
       } else {
-        setnumber(number);
+        setnumber(x);
       }
     } else {
-      if (iswithnonumberafterpoint.test(number)) {
-        setnumber(number + x);
+      if (number[number.length - 1] === ".") {
+        if (x !== ".") {
+          setnumber(number + x);
+        }
       } else {
-        let localnumber = number + x;
-        console.log(localnumber);
-        console.log(isvalidnumber.test(localnumber));
-        if (isvalidnumber.test(localnumber)) {
-          setnumber(number);
+        if (containsdot.test(number)) {
+          if (x !== ".") {
+            setnumber(number + x);
+          } else {
+            setnumber(number);
+          }
         } else {
-          setnumber(number.slice(0, -1));
+          setnumber(number + x);
         }
       }
     }
+    // if (istwodots.test(number)) {
+    //   console.log(true);
+    //   setnumber(number.slice(0, -1));
+    // }
   };
   const operatorfunction = (x) => {
     console.log(x.toString());
