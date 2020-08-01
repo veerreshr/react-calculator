@@ -1,38 +1,80 @@
-.App {
-  text-align: center;
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+body {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center;
+  min-height: 100vh;
+  background-color: #95a5a6;
+  font-family: "Roboto", sans-serif;
+}
+.calculator {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  min-width: 40vw;
+  background-color: #bdc3c7;
+  font-size: calc(20px + 1vw);
+  max-height: 100vh;
+}
+.button {
+  background-color: #ecf0f1;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+#title {
+  grid-area: 1/1/2/5;
+  padding: 20px;
+}
+
+#formula {
+  grid-area: 2/1/3/5;
+  padding: 20px;
+  text-align: right;
+}
+#display {
+  grid-area: 3/1/4/5;
+  padding: 20px;
+  text-align: right;
+}
+
+#equals {
+  background-color: #f1c40f;
   color: white;
 }
-
-.App-link {
-  color: #61dafb;
+#add,
+#subtract,
+#multiply,
+#divide {
+  color: #f1c40f;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+#title {
+  border-bottom: 1px ridge #7f8c8d;
+}
+.sign {
+  font-weight: bold;
+}
+/* #zero {
+  grid-area: 8/2/9/4;
+}
+#clear {
+  grid-area: 4/1/5/3;
+} */
+/* @media only screen and (max-width: 414) {
+  .calculator {
+    
+    max-height: 100vh;
+    width: auto;
   }
-  to {
-    transform: rotate(360deg);
+} */
+
+@media only screen and (max-width: 900px) {
+  .calculator {
+    height: 95vh;
+    min-width: 80vw;
   }
 }
