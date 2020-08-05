@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import "./App.css";
 
@@ -6,54 +6,144 @@ function App() {
   const islimitnotexceeded = /^\w{0,10}$/g;
   const isvalidnumber = /^[0-9]+(\.[0-9]+)?$/g;
   const iswithnonumberafterpoint = /^\d+\.$/g;
-  const isnotminus = /^[\+\/\*\%]$/g;
-  const isnotoperator = /^[^\+\/\*\%\-]$/g;
+  const isnotminus = /^[\+\/x\%]$/g;
+  const isoperator = /^[\+\/x%-]$/g;
+  const endswithmultipleoperator = /^.*[\+\/x%-]{2,}$/g;
   const containsdot = /^\d+\.\d+$/g;
+  const containesequals = /^.*=.*$/g;
+  const islimit = /^MAX.+/g;
   const [number, setnumber] = useState("0");
+  const [dontrespond, setdontrespond] = useState(false);
   const [formula, setformula] = useState("");
   const clear = () => {
     setnumber("0");
     setformula("");
+    setdontrespond(false);
   };
-  const clearnumber = () => {};
-  const evaluate = () => {};
+  const clearnumber = () => {
+    const length = number.length;
+    setnumber("");
+    setformula(formula.slice(0, -length));
+  };
+  const evaluate = () => {
+    const expression = formula.replace("x", "*");
+    const value = eval(expression);
+    setformula(formula + "=" + value);
+    setnumber(value);
+  };
   const numberfunction = (x) => {
-    if (x === ".") {
-      if (containsdot.test(number)) {
+    if (dontrespond) {
+      return;
+    }
+    if (number.length === 0) {
+      if (x === ".") {
+        setnumber("0.");
+        setformula(formula + "0.");
+        return;
+      } else {
+        setnumber(x);
+        setformula(formula + x);
         return;
       }
     }
-
-    if (number.length === 1 && number === "0") {
+    if (containesequals.test(formula)) {
+      setformula("");
       if (x === ".") {
-        setnumber(number + x);
+        setnumber("0.");
       } else {
         setnumber(x);
       }
+    }
+
+    if (isoperator.test(number)) {
+      if (x === ".") {
+        setnumber("0.");
+        setformula(formula + "0.");
+        return;
+      } else {
+        setnumber(x);
+        setformula(formula + x);
+        return;
+      }
     } else {
-      if (number[number.length - 1] === ".") {
-        if (x !== ".") {
+      if (number.length >= 10) {
+        let presentnumber = number;
+        setnumber("MAX LIMIT REACHED");
+        setdontrespond(true);
+
+        setTimeout(() => {
+          setnumber(presentnumber);
+          setdontrespond(false);
+        }, 500);
+        return;
+      }
+      if (x === ".") {
+        if (containsdot.test(number)) {
+          return;
+        }
+      }
+
+      if (number.length === 1 && number === "0") {
+        if (x === ".") {
           setnumber(number + x);
+          setformula(formula + "0.");
+        } else {
+          setnumber(x);
+          setformula(formula + x);
         }
       } else {
-        if (containsdot.test(number)) {
+        if (number[number.length - 1] === ".") {
           if (x !== ".") {
             setnumber(number + x);
-          } else {
-            setnumber(number);
+            setformula(formula + x);
           }
         } else {
-          setnumber(number + x);
+          if (containsdot.test(number)) {
+            if (x !== ".") {
+              setnumber(number + x);
+              setformula(formula + x);
+            } else {
+              setnumber(number);
+              setformula(formula + x);
+            }
+          } else {
+            setnumber(number + x);
+            setformula(formula + x);
+          }
         }
       }
     }
-    // if (istwodots.test(number)) {
-    //   console.log(true);
-    //   setnumber(number.slice(0, -1));
-    // }
   };
   const operatorfunction = (x) => {
-    console.log(x.toString());
+    if (containesequals.test(formula)) {
+      setformula(number + x);
+      setnumber(x);
+      return;
+    }
+
+    if (endswithmultipleoperator.test(formula) && x !== "-") {
+      setnumber(x);
+      setformula(formula.slice(0, -2) + x);
+      return;
+    }
+    setformula(formula + number);
+
+    if (x !== "-") {
+      if (!isoperator.test(number)) {
+        setformula(formula + x);
+        setnumber(x);
+      } else {
+        setformula(formula.slice(0, -1) + x);
+        setnumber(x);
+      }
+    } else {
+      if (number === "-") {
+        return;
+      } else {
+        setformula(formula + x);
+        setnumber(x);
+      }
+    }
   };
   return (
     <div className="calculator">
@@ -64,7 +154,7 @@ function App() {
         AC
       </div>
 
-      <div className="button sign" onClick={clearnumber}>
+      <div className="button sign " onClick={clearnumber}>
         CE
       </div>
       <div
@@ -86,6 +176,7 @@ function App() {
       </div>
       <div
         className="button"
+        id="seven"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
         }}
@@ -93,6 +184,7 @@ function App() {
         7
       </div>
       <div
+        id="eight"
         className="button"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
@@ -101,6 +193,7 @@ function App() {
         8
       </div>
       <div
+        id="nine"
         className="button"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
@@ -118,6 +211,7 @@ function App() {
         x
       </div>
       <div
+        id="four"
         className="button"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
@@ -126,6 +220,7 @@ function App() {
         4
       </div>
       <div
+        id="five"
         className="button"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
@@ -134,6 +229,7 @@ function App() {
         5
       </div>
       <div
+        id="six"
         className="button"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
@@ -151,6 +247,7 @@ function App() {
         -
       </div>
       <div
+        id="one"
         className="button"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
@@ -159,6 +256,7 @@ function App() {
         1
       </div>
       <div
+        id="two"
         className="button"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
@@ -167,6 +265,7 @@ function App() {
         2
       </div>
       <div
+        id="three"
         className="button"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
@@ -195,7 +294,7 @@ function App() {
       </div>
       <div
         className="button"
-        id="decimal "
+        id="decimal"
         onClick={(e) => {
           numberfunction(e.target.innerHTML);
         }}
@@ -203,7 +302,7 @@ function App() {
         .
       </div>
 
-      <div className="button sign" id="equals">
+      <div className="button sign" id="equals" onClick={evaluate}>
         =
       </div>
     </div>
